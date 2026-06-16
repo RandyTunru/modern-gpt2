@@ -1,0 +1,12 @@
+.venv/
+
+artifacts/
+logs/
+/data/
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+*.db
