@@ -1,0 +1,23 @@
+project_name: "baby-llama-110m"
+run_name: "run-01-cosmopedia"
+
+# Architecture (GPT-2 Small Scale ~ 110M Params)
+vocab_size: 32000
+d_model: 768
+num_heads: 12
+d_ff: 2048
+num_layers: 12
+max_seq_len: 4096
+
+# Training Hyperparameters
+batch_size: 32
+learning_rate: 6.0e-4
+weight_decay: 0.1
+max_steps: 50000
+log_every: 10
+save_every: 5000
+
+# Paths
+data_path: "data/processed/train_data.bin"
+checkpoint_dir: "artifacts/checkpoints/"
+wandb_dir: "logs/wandb/"
