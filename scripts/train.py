@@ -3,10 +3,10 @@ import yaml
 import torch
 import wandb
 
-import pathlib
+import sys, pathlib
 this_folder = pathlib.Path(__file__).resolve().parent
 root_folder = this_folder.parent.parent
-os.insert(0, str(root_folder))
+sys.path.insert(0, str(root_folder))
 
 from src.models.gpt import GPT
 from src.data.dataloader import PretrainDataset
