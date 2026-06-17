@@ -30,14 +30,19 @@ class PretrainDataset(Dataset):
         return X, Y
 
 if __name__ == "__main__":
-    seq_length = 4096
-    batch_size = 32
+    import argparse
+    parser = argparse.ArgumentParser(description="Test the PretrainDataset")
+    parser.add_argument('--data_path', type=str, default='data/processed/train_data.bin', help='Path to the binary data file')
+    parser.add_argument('--seq_length', type=int, default=1024, help='Sequence length for training')
+    parser.add_argument('--batch_size', type=int, default=16, help='Batch size for DataLoader')
+    
+    args = parser.parse_args()
 
-    train_dataset = PretrainDataset("data/processed/train_data.bin", seq_length)
+    train_dataset = PretrainDataset(args.data_path, args.seq_length)
 
     train_dataloader = DataLoader(
         train_dataset, 
-        batch_size=batch_size, 
+        batch_size=args.batch_size, 
         shuffle=True, 
         num_workers=4, 
         pin_memory=True
