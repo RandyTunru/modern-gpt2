@@ -42,6 +42,8 @@ if __name__ == "__main__":
         num_workers=4, 
         pin_memory=True
     )
+
+    print("DataLoader length: ", len(train_dataloader))
     
     # Just check the first batch for demonstration purposes
     for X_batch, Y_batch in train_dataloader:
