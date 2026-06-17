@@ -32,6 +32,9 @@ class Trainer:
             try:
                 X, Y = next(data_iter)
             except StopIteration:
+                if self.config['no_epochs']:
+                    break  # If we're not using epochs, we stop after one pass through the data
+                
                 data_iter = iter(self.dataloader)
                 X, Y = next(data_iter)
 

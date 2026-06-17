@@ -52,7 +52,8 @@ def main():
         dataset, 
         batch_size=config['batch_size'], 
         shuffle=True, 
-        num_workers=4, 
+        num_workers=config['num_workers'], 
+        drop_last=config['drop_last'],
         pin_memory=True
     )
 

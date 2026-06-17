@@ -21,3 +21,8 @@ save_every: 5000
 data_path: "data/processed/train_data.bin"
 checkpoint_dir: "artifacts/checkpoints/"
 wandb_dir: "logs/wandb/"
+
+# Other Configurations
+num_workers: 4
+drop_last: True # Set to True to drop the last incomplete batch if the dataset size is not divisible by the batch size
+no_epochs: True  # Set to True to disable epoch-based training and rely solely on max_steps
