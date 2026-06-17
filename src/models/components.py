@@ -47,13 +47,16 @@ class MultiHeadAttention(nn.Module):
             k = self._apply_rope(k, freqs_cis)
 
         # Scaled dot-product attention
-        scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.d_k)
+        # scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.d_k)
 
-        if mask is not None:
-            scores = scores.masked_fill(mask == 0, float('-inf'))
+        # if mask is not None:
+        #     scores = scores.masked_fill(mask == 0, float('-inf'))
         
-        attn_weights = F.softmax(scores, dim=-1)
-        attn_output = torch.matmul(attn_weights, v)
+        # attn_weights = F.softmax(scores, dim=-1)
+        # attn_output = torch.matmul(attn_weights, v)
+
+        # Optimized attention computation using PyTorch's built-in function
+        attn_output = F.scaled_dot_product_attention(q, k, v, is_causal=True)
         
         # Concatenate heads and pass through final linear layer
         attn_output = attn_output.transpose(1, 2).contiguous().view(batch_size, -1, self.d_model)
