@@ -9,7 +9,7 @@ root_folder = this_folder.parent.parent
 sys.path.insert(0, str(root_folder))
 
 from src.models.gpt import GPT
-from src.data.dataloader import PretrainDataset
+from src.data.dataset import PretrainDataset
 from torch.utils.data import DataLoader
 from src.training.trainer import Trainer
 from src.utils.metrics import get_num_params
