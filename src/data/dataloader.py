@@ -29,20 +29,20 @@ class PretrainDataset(Dataset):
         
         return X, Y
 
-seq_length = 4096
-batch_size = 32
-
-train_dataset = PretrainDataset("data/processed/train_data.bin", seq_length)
-
-train_dataloader = DataLoader(
-    train_dataset, 
-    batch_size=batch_size, 
-    shuffle=True, 
-    num_workers=4, 
-    pin_memory=True
-)
-
 if __name__ == "__main__":
+    seq_length = 4096
+    batch_size = 32
+
+    train_dataset = PretrainDataset("data/processed/train_data.bin", seq_length)
+
+    train_dataloader = DataLoader(
+        train_dataset, 
+        batch_size=batch_size, 
+        shuffle=True, 
+        num_workers=4, 
+        pin_memory=True
+    )
+    
     # Just check the first batch for demonstration purposes
     for X_batch, Y_batch in train_dataloader:
         print("Input batch shape:", X_batch.shape)  # Should be (batch_size, seq_length)
