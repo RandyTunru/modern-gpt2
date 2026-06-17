@@ -1,12 +1,16 @@
 import os
-import yaml
-import torch
-import wandb
+import dotenv
+
+dotenv.load_dotenv()
 
 import sys, pathlib
 this_folder = pathlib.Path(__file__).resolve().parent
-root_folder = this_folder.parent.parent
+root_folder = this_folder.parent
 sys.path.insert(0, str(root_folder))
+
+import yaml
+import torch
+import wandb
 
 from src.models.gpt import GPT
 from src.data.dataset import PretrainDataset
@@ -14,9 +18,9 @@ from torch.utils.data import DataLoader
 from src.training.trainer import Trainer
 from src.utils.metrics import get_num_params
 
-def main():
+def main(config_path="configs/train_gpt2_small.yaml"):
     # 1. Load Configurations
-    with open("configs/train_gpt2_small.yaml", "r") as f:
+    with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
     # 2. Setup Device
@@ -74,4 +78,11 @@ def main():
     wandb.finish()
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Train a GPT model.")
+    parser.add_argument("--config", type=str, default="configs/train_gpt2_small.yaml", help="Path to the training configuration YAML file.")
+
+    args = parser.parse_args()
+
+    main(args.config)
