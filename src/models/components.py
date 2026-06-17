@@ -25,11 +25,13 @@ class MultiHeadAttention(nn.Module):
 
         freqs_cis = freqs_cis[:seq_len].to(x.device)
 
-        x_reshaped = x.view(*x.shape[:-1], self.d_k // 2, 2)
+        x_reshaped = x.float().view(*x.shape[:-1], self.d_k // 2, 2)
         x_complex = torch.view_as_complex(x_reshaped)
 
         x_rotated = x_complex * freqs_cis
-        return torch.view_as_real(x_rotated).flatten(-2)
+
+        x_out = torch.view_as_real(x_rotated).flatten(-2)
+        return x_out.type_as(x)
         
     def forward(self, x, mask=None, freqs_cis=None):
         batch_size = x.size(0)
