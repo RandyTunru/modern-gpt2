@@ -51,4 +51,34 @@ class GPT(nn.Module):
         logits = self.output_linear(x)
         
         return logits
+    
+    @torch.no_grad()
+    def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
+        self.eval() 
+        
+        for _ in range(max_new_tokens):
+            # If current sequence is longer than max_seq_len, take only the last max_seq_len tokens as input to the model
+            idx_cond = idx if idx.size(1) <= self.max_seq_len else idx[:, -self.max_seq_len:]
+            
+            logits = self(idx_cond) # Pass the current sequence to the model
+            
+            # Focus on the last token's logits and apply temperature scaling
+            logits = logits[:, -1, :] / temperature
+            
+            # Apply top-k filtering if specified
+            if top_k is not None:
+                v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
+                logits[logits < v[:, [-1]]] = -float('Inf')
+                
+            # Apply softmax to convert logits to (normalized) probabilities
+            probs = F.softmax(logits, dim=-1)
+            
+            # Sample from the distribution
+            idx_next = torch.multinomial(probs, num_samples=1)
+            
+            # Append sampled index to the running sequence and continue
+            idx = torch.cat((idx, idx_next), dim=1)
+
+        self.train() # Revert model back to training mode after generation
+        return idx
 
