@@ -12,7 +12,7 @@ def prepare_cosmopedia():
     # Load the dataset in streaming mode
     dataset = load_dataset(
         "HuggingFaceTB/cosmopedia", 
-        "auto_math_text",
+        "stanford",
         split="train", 
         streaming=True
     ) 
@@ -23,7 +23,7 @@ def prepare_cosmopedia():
     
     # Open a file in append-binary mode
     with open(output_filepath, 'wb') as f:
-        max_docs = 100000
+        max_docs = dataset.num_rows if dataset.num_rows is not None else float('inf')
         
         num_tokens = 0
         for i, row in enumerate(tqdm(dataset, total=max_docs, desc="Packing Tokens")):
