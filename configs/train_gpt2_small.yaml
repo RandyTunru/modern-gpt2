@@ -19,7 +19,7 @@ save_every: 1000
 
 # Paths
 data_path: "data/processed/train_data.bin"
-checkpoint_dir: "artifacts/checkpoints/"
+checkpoint_dir: "artifacts/checkpoints/1024_seq_pretrain/"
 wandb_dir: "logs/wandb/"
 
 # Other Configurations
