@@ -28,7 +28,10 @@ def main(prompt, checkpoint_path, config_path="configs/train_gpt2_small.yaml", m
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         model = GPT(**model_config)
-        model.load_state_dict(torch.load(checkpoint_path).get("model_state_dict", torch.load(checkpoint_path)))
+        
+        checkpoint = torch.load(checkpoint_path)
+        state_dict = checkpoint.get("model_state_dict", checkpoint)
+        model.load_state_dict(state_dict, strict=False)
         model.to(device)
 
         tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1")
