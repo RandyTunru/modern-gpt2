@@ -10,7 +10,7 @@ from transformers import AutoTokenizer
 
 from src.models.gpt import GPT
 
-def main(prompt, checkpoint_path, config_path="configs/train_gpt2_small.yaml"):
+def main(prompt, checkpoint_path, config_path="configs/train_gpt2_small.yaml", max_new_tokens=512, temperature=1.0, top_k=50):
     # Example configuration for GPT-2 Small
 
     with open(config_path, "r") as f:
@@ -38,7 +38,7 @@ def main(prompt, checkpoint_path, config_path="configs/train_gpt2_small.yaml"):
         print(f"Input IDs: {input_ids}")
         print(f"Tokenized Prompt: {tokenized_prompt}")
 
-        generated_ids = model.generate(input_ids, max_new_tokens=512, temperature=1.0, top_k=20)
+        generated_ids = model.generate(input_ids, max_new_tokens=max_new_tokens, temperature=temperature, top_k=top_k, eos_id=tokenizer.eos_token_id)
 
         generated_text = tokenizer.decode(generated_ids[0], skip_special_tokens=False)
         print("Generated Text:")
@@ -55,6 +55,9 @@ if __name__ == "__main__":
     parser.add_argument("prompt", type=str, help="The input prompt to generate text from.")
     parser.add_argument("--checkpoint", type=str, required=True, help="Path to the model checkpoint file.")
     parser.add_argument("--config", type=str, default="configs/train_gpt2_small.yaml", help="Path to the model configuration file.")
+    parser.add_argument("--max-new-tokens", type=int, default=512, help="Maximum number of new tokens to generate.")
+    parser.add_argument("--temperature", type=float, default=1.0, help="Sampling temperature for generation.")
+    parser.add_argument("--top-k", type=int, default=50, help="Top-k sampling for generation.")
     args = parser.parse_args()
 
-    main(args.prompt, args.checkpoint, args.config)
+    main(args.prompt, args.checkpoint, args.config, args.max_new_tokens, args.temperature, args.top_k)
