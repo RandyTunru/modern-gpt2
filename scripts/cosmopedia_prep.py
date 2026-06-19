@@ -24,7 +24,7 @@ def prepare_cosmopedia(subset, split, output_file, max_docs=None):
     # Open a file in append-binary mode
     with open(output_filepath, 'wb') as f:
         if max_docs is None:
-            max_docs = dataset.num_rows if dataset.num_rows is not None else float('inf')
+            max_docs = float('inf')
         
         num_tokens = 0
         for i, row in enumerate(tqdm(dataset, total=max_docs, desc="Packing Tokens")):
