@@ -1,3 +1,6 @@
+import dotenv
+dotenv.load_dotenv()
+
 import sys, pathlib
 
 this_folder = pathlib.Path(__file__).resolve().parent
@@ -28,7 +31,7 @@ def main(prompt, checkpoint_path, config_path="configs/train_gpt2_small.yaml", m
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         model = GPT(**model_config)
-        
+
         checkpoint = torch.load(checkpoint_path)
         state_dict = checkpoint.get("model_state_dict", checkpoint)
         model.load_state_dict(state_dict, strict=False)
@@ -50,6 +53,8 @@ def main(prompt, checkpoint_path, config_path="configs/train_gpt2_small.yaml", m
         raw_subtokens = tokenizer.convert_ids_to_tokens(generated_ids[0])
         print("Raw Subtokens:")
         print(raw_subtokens)
+
+        print("Length of Generated IDs:", len(generated_ids[0]))
 
 if __name__ == "__main__":
     import argparse
