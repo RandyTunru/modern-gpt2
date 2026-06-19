@@ -1,0 +1,29 @@
+project_name: "baby-llama-110m"
+run_name: "run-02-cpt-2048"
+
+vocab_size: 32000
+d_model: 768
+num_heads: 12
+d_ff: 2048
+num_layers: 12
+max_seq_len: 2048  # Extended Context
+original_seq_len: 1024 # Original context length used in pretraining
+
+# Training Hyperparameters
+batch_size: 8                 
+gradient_accumulation_steps: 2 
+learning_rate: 2.0e-4          # CPT uses a lower learning rate than baseline pretraining
+weight_decay: 0.1
+max_steps: 10000               # Shorter CPT phase
+log_every: 50
+save_every: 1000
+
+# Paths
+from_checkpoint: "artifacts/checkpoints/1024_seq_pretraining/model_step_final.pt"
+data_path: "data/processed/train_data_auto_math_cosmopedia.bin"
+checkpoint_dir: "artifacts/checkpoints/2048_seq_cpt/"
+wandb_dir: "logs/wandb/"
+
+num_workers: 4
+drop_last: True
+no_epochs: True
