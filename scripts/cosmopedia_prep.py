@@ -1,3 +1,7 @@
+import dotenv
+
+dotenv.load_dotenv()
+
 import os
 import numpy as np
 from datasets import load_dataset
