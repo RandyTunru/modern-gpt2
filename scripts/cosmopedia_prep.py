@@ -8,7 +8,7 @@ from datasets import load_dataset
 from transformers import AutoTokenizer
 from tqdm import tqdm
 
-def prepare_cosmopedia(subset, split, output_file, max_docs=None):
+def prepare_cosmopedia(subset, split, output_file, max_docs=None, min_tokens=512):
     tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1")
     eos_id = tokenizer.eos_token_id
     bos_id = tokenizer.bos_token_id
@@ -36,9 +36,15 @@ def prepare_cosmopedia(subset, split, output_file, max_docs=None):
                 break
                 
             text = row['text']
+
+            tokenized = tokenizer.encode(text, add_special_tokens=False)
+
+            # Skip documents that are too short
+            if len(tokenized) < min_tokens:
+                continue
             
             # Tokenize the text and append EOS token
-            token_ids = [bos_id] + tokenizer.encode(text, add_special_tokens=False) + [eos_id]
+            token_ids = [bos_id] + tokenized + [eos_id]
 
             # Convert to numpy array of 16-bit integers 
             token_array = np.array(token_ids, dtype=np.uint16)
@@ -56,6 +62,7 @@ if __name__ == "__main__":
     parser.add_argument("--split", type=str, default="train", help="Dataset split to process (e.g., train, validation)")
     parser.add_argument("--output-file", type=str, default="data/processed/train_data.bin", help="Output file path")
     parser.add_argument("--max-docs", type=int, default=None, help="Maximum number of documents to process (for testing)")
+    parser.add_argument("--min-tokens", type=int, default=512, help="Minimum number of tokens per document to include in the output")
 
     args = parser.parse_args()
 
@@ -64,6 +71,7 @@ if __name__ == "__main__":
         subset=args.subset,
         split=args.split,
         output_file=args.output_file,
-        max_docs=args.max_docs
+        max_docs=args.max_docs,
+        min_tokens=args.min_tokens
     )
     print(f"{args.output_file} file is ready.")
