@@ -12,7 +12,8 @@ original_seq_len: 1024 # Original context length used in pretraining
 # Training Hyperparameters
 batch_size: 8                 
 gradient_accumulation_steps: 2 
-learning_rate: 2.0e-4          # CPT uses a lower learning rate than baseline pretraining
+learning_rate: 2.0e-5          # CPT uses a lower learning rate than baseline pretraining
+warmup_steps: 500
 weight_decay: 0.1
 max_steps: 10000               # Shorter CPT phase
 log_every: 50
@@ -20,7 +21,7 @@ save_every: 1000
 
 # Paths
 from_checkpoint: "artifacts/checkpoints/1024_seq_pretraining/model_step_final.pt"
-data_path: "data/processed/train_data_auto_math_cosmopedia.bin"
+data_path: "data/processed/web_v1_min_1024_cosmopedia.bin"
 checkpoint_dir: "artifacts/checkpoints/2048_seq_cpt/"
 wandb_dir: "logs/wandb/"
 
