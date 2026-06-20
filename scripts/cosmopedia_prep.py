@@ -31,6 +31,7 @@ def prepare_cosmopedia(subset, split, output_file, max_docs=None, min_tokens=512
             max_docs = float('inf')
         
         num_tokens = 0
+        doc_count = 0
         for i, row in enumerate(tqdm(dataset, total=max_docs, desc="Packing Tokens")):
             if i >= max_docs:
                 break
@@ -43,6 +44,8 @@ def prepare_cosmopedia(subset, split, output_file, max_docs=None, min_tokens=512
             if len(tokenized) < min_tokens:
                 continue
             
+            doc_count += 1
+
             # Tokenize the text and append EOS token
             token_ids = [bos_id] + tokenized + [eos_id]
 
@@ -53,7 +56,8 @@ def prepare_cosmopedia(subset, split, output_file, max_docs=None, min_tokens=512
             f.write(token_array.tobytes())
             num_tokens += len(token_ids)
 
-    print(f"Total tokens processed: {num_tokens}")
+    print(f"Total documents processed: {doc_count}")
+    print(f"Total tokens written to file: {num_tokens}")
 
 if __name__ == "__main__":
     import argparse
@@ -62,7 +66,7 @@ if __name__ == "__main__":
     parser.add_argument("--split", type=str, default="train", help="Dataset split to process (e.g., train, validation)")
     parser.add_argument("--output-file", type=str, default="data/processed/train_data.bin", help="Output file path")
     parser.add_argument("--max-docs", type=int, default=None, help="Maximum number of documents to process (for testing)")
-    parser.add_argument("--min-tokens", type=int, default=512, help="Minimum number of tokens per document to include in the output")
+    parser.add_argument("--min-tokens", type=int, default=512, help="Minimum number of tokens per document to be included in the output")
 
     args = parser.parse_args()
 
