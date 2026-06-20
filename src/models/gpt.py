@@ -60,7 +60,7 @@ class GPT(nn.Module):
         return logits
     
     @torch.no_grad()
-    def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None, eos_id=0):
+    def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None, eos_id=0, repetition_penalty=1.0):
         self.eval() 
         
         for _ in range(max_new_tokens):
@@ -68,9 +68,30 @@ class GPT(nn.Module):
             idx_cond = idx if idx.size(1) <= self.max_seq_len else idx[:, -self.max_seq_len:]
             
             logits = self(idx_cond) # Pass the current sequence to the model
+
+            logits = logits[:, -1, :] # Focus on the last token's logits for generation
             
-            # Focus on the last token's logits and apply temperature scaling
-            logits = logits[:, -1, :] / temperature
+            if repetition_penalty != 1.0:
+                # Iterate over the batch dimension
+                for b in range(logits.shape[0]):
+                    # Find all unique tokens that have appeared in this sequence so far
+                    prev_tokens = torch.unique(idx[b])
+                    
+                    # Fetch the current logits for those specific tokens
+                    prev_logits = logits[b, prev_tokens]
+                    
+                    # Apply the penalty: multiply if negative, divide if positive
+                    penalized_logits = torch.where(
+                        prev_logits < 0, 
+                        prev_logits * repetition_penalty, 
+                        prev_logits / repetition_penalty
+                    )
+                    
+                    # Assign the penalized logits back to the main logits tensor
+                    logits[b, prev_tokens] = penalized_logits
+            
+            # Apply temperature scaling
+            logits = logits / temperature
             
             # Apply top-k filtering if specified
             if top_k is not None:
