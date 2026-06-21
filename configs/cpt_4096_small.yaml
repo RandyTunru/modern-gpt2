@@ -12,8 +12,8 @@ original_seq_len: 1024 # Original context length used in pretraining
 # Training Hyperparameters
 batch_size: 4                 
 gradient_accumulation_steps: 4 
-learning_rate: 2.0e-4          # CPT uses a lower learning rate than baseline pretraining
-warmup_steps: 1000
+learning_rate: 2.0e-5          # CPT uses a lower learning rate than baseline pretraining
+warmup_steps: 500
 weight_decay: 0.1
 max_steps: 10000               # Shorter CPT phase
 log_every: 50
