@@ -13,7 +13,7 @@ import torch
 import wandb
 
 from src.models.gpt import GPT
-from src.data.dataset import PretrainDataset
+from src.data.dataset import PretrainDataset, SFTDataset
 from torch.utils.data import DataLoader
 from src.training.trainer import Trainer
 from src.utils.metrics import get_num_params
@@ -82,7 +82,10 @@ def main(config_path="configs/train_gpt2_small.yaml"):
     model.to(device)
 
     # 5. Initialize the DataLoader
-    dataset = PretrainDataset(config['data_path'], config['max_seq_len'])
+    if config.get('use_sft_masking'):
+        dataset = SFTDataset(config['data_path'], config['max_seq_len'])
+    else:
+        dataset = PretrainDataset(config['data_path'], config['max_seq_len'])
     dataloader = DataLoader(
         dataset, 
         batch_size=config['batch_size'], 
