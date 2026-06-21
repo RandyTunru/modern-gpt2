@@ -1,3 +1,4 @@
+import json
 import torch
 import numpy as np
 from datasets import load_dataset
@@ -10,24 +11,23 @@ class PretrainDataset(Dataset):
         self.data = np.memmap(data_path, dtype=np.uint16, mode='r')
         
         self.total_tokens = len(self.data)
-        self.num_samples = (self.total_tokens - 1) // self.seq_length # Minus 1 because we need seq_length + 1 tokens for input-target pairs
+        self.num_samples = self.total_tokens // self.seq_length
 
     def __len__(self):
         return self.num_samples
 
     def __getitem__(self, idx):
-        # We grab seq_length + 1 tokens from the disk because we need to create input-target pairs where the target is the next token after the input sequence.
+        # We grab seq_length tokens from the disk because we need to create input-target pairs where the target is the next token after the input sequence.
         start_idx = idx * self.seq_length
-        end_idx = start_idx + self.seq_length + 1
+        end_idx = start_idx + self.seq_length # No shift, we will handle in the train loop
         
         chunk = self.data[start_idx : end_idx]
         chunk_tensor = torch.from_numpy(chunk.astype(np.int64))
         
-        # X gets the first seq_length tokens, Y gets shifted by one token to the right (the next token for each position in X)
-        X = chunk_tensor[:-1]
-        Y = chunk_tensor[1:]
-        
-        return X, Y
+        return {
+            "input_ids": chunk_tensor,
+            "labels": chunk_tensor.clone()  # Labels are are a copy of the input_ids, the shift will be handled in the training loop to align predictions with targets
+        }
 
 if __name__ == "__main__":
     import argparse
