@@ -64,23 +64,30 @@ class Trainer:
             # --- Gradient Accumulation Loop ---
             for micro_step in range(self.grad_accum_steps):
                 try:
-                    X, Y = next(data_iter)
+                    batch = next(data_iter)
                 except StopIteration:
                     if self.config['no_epochs']:
                         print("Dataset exhausted. Stopping training loop.")
                         return
                     data_iter = iter(self.dataloader)
-                    X, Y = next(data_iter)
+                    batch = next(data_iter)
 
-                X, Y = X.to(self.device), Y.to(self.device)
+                X = batch['input_ids'].to(self.device)
+                Y = batch['labels'].to(self.device)
 
                 with ctx:
                     logits = self.model(X)
 
+                    # Implement shift (cut off last token for logits and first token for labels) to align predictions with targets
+                    # Minor drawback: This means last token is not predicted and loss calculation is only seq_length - 1 tokens (standard huggingface practice)
+                    logits = logits[..., :-1, :].contiguous()
+                    Y = Y[..., 1:].contiguous()
+
                     # Reshape for CrossEntropyLoss: x (batch_size * seq_len, vocab_size) and y (batch_size * seq_len)
                     loss = F.cross_entropy(
                         logits.view(-1, logits.size(-1)), 
-                        Y.view(-1)
+                        Y.view(-1),
+                        ignore_index=self.config.get('ignore_index', -100)
                     )
 
                     # Scale loss based on gradient accumulation steps to maintain correct optimization dynamics
