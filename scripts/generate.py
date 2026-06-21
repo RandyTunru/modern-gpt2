@@ -58,6 +58,9 @@ def main(prompt, checkpoint_path, config_path="configs/train_gpt2_small.yaml", m
 
         model = GPT(**model_config)
 
+        if checkpoint_path is None:
+            checkpoint_path = f"{config['checkpoint_dir']}model_step_final.pt"  # Default to the final checkpoint if none is provided
+
         checkpoint = torch.load(checkpoint_path, map_location=device)
         state_dict = checkpoint.get("model_state_dict", checkpoint)
         model.load_state_dict(state_dict, strict=False)
@@ -101,7 +104,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Generate text using a trained GPT model.")
     parser.add_argument("prompt", type=str, help="The input prompt to generate text from.")
-    parser.add_argument("--checkpoint", type=str, required=True, help="Path to the model checkpoint file.")
+    parser.add_argument("--checkpoint", type=str, help="Path to the model checkpoint file.")
     parser.add_argument("--config", type=str, default="configs/train_gpt2_small.yaml", help="Path to the model configuration file.")
     parser.add_argument("--max-new-tokens", type=int, default=512, help="Maximum number of new tokens to generate.")
     parser.add_argument("--temperature", type=float, default=1.0, help="Sampling temperature for generation.")
