@@ -74,9 +74,17 @@ class Trainer:
 
                 X = batch['input_ids'].to(self.device)
                 Y = batch['labels'].to(self.device)
+                doc_ids = batch.get('doc_ids', None) # Optional, further implementation for SFT block diagonal masks
+
+                # Build attention mask if needed (for SFT block diagonal masking)
+                if doc_ids is not None and self.config.get('use_sft_masking', False):
+                    doc_ids = doc_ids.to(self.device)
+                    attention_mask = (doc_ids.unsqueeze(1) == doc_ids.unsqueeze(2)).unsqueeze(1) # Shape: (batch_size, 1, seq_len, seq_len)
+                else:
+                    attention_mask = None
 
                 with ctx:
-                    logits = self.model(X)
+                    logits = self.model(X, attention_mask=attention_mask)
 
                     # Implement shift (cut off last token for logits and first token for labels) to align predictions with targets
                     # Minor drawback: This means last token is not predicted and loss calculation is only seq_length - 1 tokens (standard huggingface practice)

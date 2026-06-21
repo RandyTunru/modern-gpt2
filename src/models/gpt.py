@@ -36,13 +36,13 @@ class GPT(nn.Module):
         freqs_cis = torch.polar(torch.ones_like(angles), angles)  
         
         # Causal Mask 
-        mask = torch.tril(torch.ones(self.max_seq_len, self.max_seq_len)).unsqueeze(0).unsqueeze(0)
+        mask = torch.tril(torch.ones(self.max_seq_len, self.max_seq_len)).bool().unsqueeze(0).unsqueeze(0)
         
         # Register them as buffers to ensure they are moved to the correct device with the model
         self.register_buffer('freqs_cis', freqs_cis, persistent=False)
         self.register_buffer('mask', mask, persistent=False)
 
-    def forward(self, x):
+    def forward(self, x, attention_mask=None):
         batch_size, seq_len = x.size()
         assert seq_len <= self.max_seq_len, "Input sequence length exceeds model's maximum sequence length"
 
@@ -50,6 +50,9 @@ class GPT(nn.Module):
 
         # Dynamic mask size according to input sequence length
         batch_mask = self.mask[:, :, :seq_len, :seq_len]
+
+        if attention_mask is not None:
+            batch_mask = batch_mask & attention_mask
 
         for block in self.blocks:
             x = block(x, mask=batch_mask, freqs_cis=self.freqs_cis)

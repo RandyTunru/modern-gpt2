@@ -56,7 +56,7 @@ class MultiHeadAttention(nn.Module):
         # attn_output = torch.matmul(attn_weights, v)
 
         # Optimized attention computation using PyTorch's built-in function
-        attn_output = F.scaled_dot_product_attention(q, k, v, is_causal=True)
+        attn_output = F.scaled_dot_product_attention(q, k, v, is_causal=False, attn_mask=mask)
         
         # Concatenate heads and pass through final linear layer
         attn_output = attn_output.transpose(1, 2).contiguous().view(batch_size, -1, self.d_model)
