@@ -1,4 +1,4 @@
-# modern-gpt2
+# Llama-style language model
 
 A from-scratch ~110M-parameter decoder-only language model and its full training pipeline: **pretraining → continued pretraining with context extension → supervised fine-tuning (SFT)**. The architecture borrows modern LLaMA/Mistral-style components (RoPE, RMSNorm, weight tying) and uses the Mistral tokenizer.
 
